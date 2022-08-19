@@ -20,3 +20,15 @@
   scrollbar-color: rgba(255, 255, 255, 0.85) transparent;
   scrollbar-width: thin;
 }
+
+*:not(.material-icons) {
+  font-family: "Noto Sans JP", sans-serif !important;
+}
+
+body {
+  background-color: #121212;
+}
+
+.logo-type {
+  font-family: "Rubik Dirt" !important;
+}

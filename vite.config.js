@@ -27,12 +27,17 @@ export default defineConfig(({ mode }) => {
         root: __dirname,
       }),
       react({
+        jsxImportSource: "@emotion/react",
         babel: {
           parserOpts: {
-            plugins: ["decorators-legacy", "classProperties"],
+            plugins: ["decorators-legacy", "classProperties", "@emotion/babel-plugin"],
           },
         },
       }),
     ],
+    esbuild: {
+      // REF: https://github.com/vitejs/vite/issues/8644
+      logOverride: { "this-is-undefined-in-esm": "silent" },
+    },
   };
 });

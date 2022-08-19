@@ -1,5 +1,6 @@
+import Logger from "@/utils/logger";
 import { action, observable } from "mobx";
-import ToastStore from "./toast";
+import { SnackbarMessage, OptionsObject, SnackbarKey } from "notistack";
 import LoadingStore from "./loading";
 
 export enum State {
@@ -9,47 +10,17 @@ export enum State {
   ERROR,
 }
 
-export enum Mode {
-  NONE,
-  GET,
-  SEARCH,
-  CREATE,
-  UPDATE,
-  DELETE,
-  ACTIVATE,
-  LOGIN,
-  LOGOUT,
-  IMPORT,
-}
-
-export interface IModel {
-  _id: string;
-  _created: string;
-  _modified: string;
-}
-
-export interface IPaginate {
-  current: number;
-  perPage: number;
-  recordsOnPage: number;
-  totalPages: number;
-  totalRecords: number;
-}
-
 export default class Base {
   constructor() {
     this.state = State.IDLE;
-    this.mode = Mode.NONE;
   }
 
   @observable
   public state: State;
 
-  @observable
-  public mode: Mode;
-
   @action.bound
   public setState(state: State) {
+    Logger.verbose("BaseStore", "setState:", state);
     this.state = state;
     LoadingStore.setLoading(state === State.RUNNING);
   }
@@ -59,26 +30,8 @@ export default class Base {
     this.setState(State.IDLE);
   }
 
-  @action.bound
-  public setMode(mode: Mode) {
-    this.mode = mode;
-  }
-
-  @action.bound
-  public resetMode() {
-    this.mode = Mode.NONE;
-  }
-
-  protected tryShowToast(message?: string) {
-    try {
-      ToastStore.showToast(message);
-    } catch (e) {
-      console.error("Toast", e);
-    }
-  }
-
   protected get apiBaseUrl() {
-    let baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+    let baseUrl = import.meta.env.VITE_API_BASE_URL || "https://api.nature.global/";
     if (!baseUrl.endsWith("/")) {
       baseUrl = `${baseUrl}/`;
     }
@@ -86,25 +39,25 @@ export default class Base {
   }
 
   protected apiUrl(...path: string[]) {
-    console.log("path:", path);
+    Logger.verbose("BaseStore", "path:", path);
     return this.apiBaseUrl + path.map((param) => param.replace(/\/$/, "")).join("/");
   }
 
-  protected get selectedTenantId() {
-    return localStorage.overrideTenantId || localStorage.tenantId;
+  protected mockUrl(...path: string[]) {
+    Logger.verbose("BaseStore", "path:", path);
+    return "http://localhost:1234/" + path.map((param) => param.replace(/\/$/, "")).join("/");
   }
 
   protected generateFetchHeader(withAuth = true, override?: any) {
     const baseHeader = {
       Accept: "application/json",
       "Content-Type": "application/json",
-      "If-Modified-Since": "Thu, 01 Jun 1970 00:00:00 GMT",
     };
     let result: any = { ...baseHeader };
     if (withAuth) {
       result = {
         ...result,
-        Authorization: `Bearer ${localStorage.accessToken}`,
+        Authorization: `Bearer ${localStorage.accessToken || sessionStorage.accessToken}`,
       };
     }
     if (override) {
@@ -121,7 +74,19 @@ export default class Base {
     return LoadingStore.loading;
   }
 
-  protected fetchable() {
-    return !!localStorage.accessToken;
+  protected get fetchable() {
+    return !!localStorage.accessToken || !!sessionStorage.accessToken;
+  }
+
+  protected get accessToken() {
+    return localStorage.accessToken || sessionStorage.accessToken;
+  }
+
+  protected tryEnqueueSnackbar(message: SnackbarMessage, options?: OptionsObject): SnackbarKey | null {
+    const func = (window as any).enqueueSnackbar;
+    if (typeof func == "function") {
+      return func(message, options) as SnackbarKey;
+    }
+    return null;
   }
 }

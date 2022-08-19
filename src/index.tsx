@@ -1,3 +1,4 @@
+import "sanitize.css";
 import "./style.scss";
 import { setLogLevel, original } from "./utils/logger";
 import React from "react";
@@ -6,7 +7,11 @@ import { Provider } from "mobx-react";
 import { stores } from "@/stores";
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { App } from "./app";
+import { ErrorBoundary } from "react-error-boundary";
+import { SnackbarProvider } from "notistack";
+import { App } from "./containers/app";
+import { Catch } from "./components/catch";
+import { Loading } from "./containers/loading";
 
 original.info("%c" + `RemoWeb`, "font-size: 32px; color: #90CAF9");
 original.info("%c" + `hash: ${import.meta.env.VITE_GIT_HASH || "-"}`, "font-size: 22px; color: #F48FB1");
@@ -20,12 +25,23 @@ const theme = createTheme({
 });
 
 createRoot(document.querySelector("#app")!).render(
-  <>
+  <ErrorBoundary FallbackComponent={Catch}>
     <Provider {...stores}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <App />
+        <SnackbarProvider
+          maxSnack={5}
+          autoHideDuration={5000}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          preventDuplicate
+        >
+          <App />
+          <Loading />
+        </SnackbarProvider>
       </ThemeProvider>
     </Provider>
-  </>,
+  </ErrorBoundary>,
 );
