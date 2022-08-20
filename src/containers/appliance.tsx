@@ -19,6 +19,9 @@ import {
   DialogTitle,
   IconButton,
   Icon,
+  Divider,
+  Tab,
+  Tabs,
 } from "@mui/material";
 
 interface IProps {
@@ -110,6 +113,7 @@ export const Appliance = inject("ApplianceStore")(
             </Box>
           </DialogTitle>
           <DialogContent>
+            {props.ApplianceStore!.appliances[applianceIndex]?.aircon && <Aircon applianceIndex={applianceIndex} />}
             {props.ApplianceStore!.appliances[applianceIndex]?.light &&
               props.ApplianceStore!.appliances[applianceIndex]?.light.buttons.map((button) => (
                 <Button key={button.name} onClick={() => props.ApplianceStore!.sendLight(props.ApplianceStore!.appliances[applianceIndex]?.id, button.name)}>
@@ -130,6 +134,49 @@ export const Appliance = inject("ApplianceStore")(
               ))}
           </DialogContent>
         </Dialog>
+      </>
+    );
+  }),
+);
+
+const Aircon = inject("ApplianceStore")(
+  observer((props: IProps & { applianceIndex: number }) => {
+    const { id, aircon, settings } = props.ApplianceStore!.appliances[props.applianceIndex];
+
+    const [mode, setMode] = useState(settings.mode);
+
+    return (
+      <>
+        {aircon?.range.fixedButtons && (
+          <>
+            {aircon.range.fixedButtons?.map((button, index) => (
+              <Button key={index} onClick={() => props.ApplianceStore!.sendAircon(id, { button })}>
+                {button}
+              </Button>
+            ))}
+            <Divider sx={{ my: 2 }} />
+          </>
+        )}
+        {aircon?.range.modes && (
+          <>
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Tabs value={mode} onChange={(e, value) => setMode(value)}>
+                {Object.keys(aircon?.range.modes).map((modeKey) => (
+                  <Tab label={modeKey} value={modeKey} />
+                ))}
+              </Tabs>
+            </Box>
+            {
+              <>
+                {(aircon?.range.modes as any)[mode].temp.map((temp: any) => (
+                  <Button key={temp} onClick={() => "TODO"}>
+                    {temp}
+                  </Button>
+                ))}
+              </>
+            }
+          </>
+        )}
       </>
     );
   }),
