@@ -13,9 +13,7 @@ import {
   useMediaQuery,
   useTheme,
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   IconButton,
   Icon,
@@ -83,14 +81,20 @@ export const Appliance = inject("ApplianceStore")(
     const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
     const [isOpenDialog, setIsOpenDialog] = useState(false);
     const [applianceIndex, setApplianceIndex] = useState(-1);
+    const [sent, setSent] = useState(false);
 
     const openDialog = (index: number) => {
+      setSent(false);
       setApplianceIndex(index);
       setIsOpenDialog(true);
     };
     const closeDialog = () => {
       setIsOpenDialog(false);
       setApplianceIndex(-1);
+
+      if (sent) {
+        props.ApplianceStore!.fetchAppliances();
+      }
     };
 
     return (
@@ -108,8 +112,8 @@ export const Appliance = inject("ApplianceStore")(
               <Card className={"appliance"}>
                 <CardActionArea onClick={() => openDialog(index)}>
                   <Box css={styles.paper}>
-                    <Typography>{appliance.nickname}</Typography>
-                  </Box>
+                      <Typography>{appliance.nickname}</Typography>
+                    </Box>
                 </CardActionArea>
               </Card>
             </Grid>
@@ -131,22 +135,28 @@ export const Appliance = inject("ApplianceStore")(
             </Box>
           </DialogTitle>
           <DialogContent>
-            {props.ApplianceStore!.appliances[applianceIndex]?.aircon && <Aircon applianceIndex={applianceIndex} />}
+            {props.ApplianceStore!.appliances[applianceIndex]?.aircon && <Aircon applianceIndex={applianceIndex} send={() => setSent(true)} />}
             {props.ApplianceStore!.appliances[applianceIndex]?.light &&
               props.ApplianceStore!.appliances[applianceIndex]?.light.buttons.map((button) => (
-                <Button key={button.name} onClick={() => props.ApplianceStore!.sendLight(props.ApplianceStore!.appliances[applianceIndex]?.id, button.name)}>
+                <Button
+                  key={button.name}
+                  onClick={() => props.ApplianceStore!.sendLight(props.ApplianceStore!.appliances[applianceIndex]?.id, button.name).then(() => setSent(true))}
+                >
                   {button.label}
                 </Button>
               ))}
             {props.ApplianceStore!.appliances[applianceIndex]?.tv &&
               props.ApplianceStore!.appliances[applianceIndex]?.tv.buttons.map((button) => (
-                <Button key={button.name} onClick={() => props.ApplianceStore!.sendTv(props.ApplianceStore!.appliances[applianceIndex]?.id, button.name)}>
+                <Button
+                  key={button.name}
+                  onClick={() => props.ApplianceStore!.sendTv(props.ApplianceStore!.appliances[applianceIndex]?.id, button.name).then(() => setSent(true))}
+                >
                   {button.label}
                 </Button>
               ))}
             {props.ApplianceStore!.appliances[applianceIndex]?.signals &&
               props.ApplianceStore!.appliances[applianceIndex]?.signals.map((signal) => (
-                <Button key={signal.id} onClick={() => props.ApplianceStore!.sendSignal(signal.id)}>
+                <Button key={signal.id} onClick={() => props.ApplianceStore!.sendSignal(signal.id).then(() => setSent(true))}>
                   {signal.name}
                 </Button>
               ))}
@@ -170,7 +180,7 @@ const fallbackIndex = (arr: string[]) => {
 };
 
 const Aircon = inject("ApplianceStore")(
-  observer((props: IProps & { applianceIndex: number }) => {
+  observer((props: IProps & { applianceIndex: number; send: () => void }) => {
     const { id, aircon, settings } = props.ApplianceStore!.appliances[props.applianceIndex];
 
     const [operation_mode, setOperationMode] = useState(settings.mode);
@@ -200,7 +210,7 @@ const Aircon = inject("ApplianceStore")(
         {aircon?.range.fixedButtons && (
           <>
             {aircon.range.fixedButtons?.map((button, index) => (
-              <Button key={index} onClick={() => props.ApplianceStore!.sendAircon(id, { button })}>
+              <Button key={index} onClick={() => props.ApplianceStore!.sendAircon(id, { button }).then(() => props.send())}>
                 {button}
               </Button>
             ))}
@@ -280,7 +290,9 @@ const Aircon = inject("ApplianceStore")(
               </>
             }
             <Box css={styles.actionButton} pt={1}>
-              <Button onClick={() => props.ApplianceStore!.sendAircon(id, { operation_mode, temperature, air_direction, air_volume })}>適用</Button>
+              <Button onClick={() => props.ApplianceStore!.sendAircon(id, { operation_mode, temperature, air_direction, air_volume }).then(() => props.send())}>
+                適用
+              </Button>
             </Box>
           </>
         )}
