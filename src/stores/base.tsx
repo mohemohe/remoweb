@@ -43,11 +43,6 @@ export default class Base {
     return this.apiBaseUrl + path.map((param) => param.replace(/\/$/, "")).join("/");
   }
 
-  protected mockUrl(...path: string[]) {
-    Logger.verbose("BaseStore", "path:", path);
-    return "http://localhost:1234/" + path.map((param) => param.replace(/\/$/, "")).join("/");
-  }
-
   protected generateFetchHeader(withAuth = true, override?: any) {
     const baseHeader = {
       Accept: "application/json",

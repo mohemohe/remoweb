@@ -33,10 +33,6 @@ export default class AuthStore extends Base {
       return this.setAuthStatus(AuthStatus.Unauthorized);
     }
 
-    if (this.accessToken === "mock") {
-      return this.setAuthStatus(AuthStatus.Authorized);
-    }
-
     this.setState(State.RUNNING);
     try {
       const res = await ky.get(this.apiUrl("1/users/me"), { headers: this.generateFetchHeader() });
@@ -56,11 +52,7 @@ export default class AuthStore extends Base {
   @action
   public async login(accessToken: string, useLocalStorage: boolean) {
     sessionStorage.accessToken = accessToken;
-    if (accessToken === "mock") {
-      this.setAuthStatus(AuthStatus.Authorized);
-    } else {
-      await this.checkAuth();
-    }
+    await this.checkAuth();
     if (this.authStatus !== AuthStatus.Authorized) {
       this.tryEnqueueSnackbar("認証エラー");
       return this.logout(false);

@@ -22,13 +22,7 @@ export default class ApplianceStore extends Base {
 
     this.setState(State.RUNNING);
     try {
-      let url;
-      if (this.accessToken === "mock") {
-        url = this.mockUrl("1/appliances");
-      } else {
-        url = this.apiUrl("1/appliances");
-      }
-      const res = await ky.get(url, { headers: this.generateFetchHeader() });
+      const res = await ky.get(this.apiUrl("1/appliances"), { headers: this.generateFetchHeader() });
       if (!res.ok) {
         throw new Error();
       }

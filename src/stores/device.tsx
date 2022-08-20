@@ -22,13 +22,7 @@ export default class DeviceStore extends Base {
 
     this.setState(State.RUNNING);
     try {
-      let url;
-      if (this.accessToken === "mock") {
-        url = this.mockUrl("1/devices");
-      } else {
-        url = this.apiUrl("1/devices");
-      }
-      const res = await ky.get(url, { headers: this.generateFetchHeader() });
+      const res = await ky.get(this.apiUrl("1/devices"), { headers: this.generateFetchHeader() });
       if (!res.ok) {
         throw new Error();
       }
