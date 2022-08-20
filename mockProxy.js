@@ -11,10 +11,10 @@ console.log("listen at http://localhost:1234");
 
 createServer((req, res) => {
   const defaultHeaders = {
-    "Access-Control-Allow-Origin": req.headers.origin,
+    "access-control-allow-origin": req.headers.origin,
   };
   if (req.method === "OPTIONS") {
-    res.writeHead(200, { ...defaultHeaders, "Access-Control-Allow-Headers": req.headers["access-control-request-headers"] });
+    res.writeHead(200, { ...defaultHeaders, "access-control-allow-headers": req.headers["access-control-request-headers"] });
     res.end();
     return;
   }
@@ -37,7 +37,7 @@ createServer((req, res) => {
     req.pipe(
       reqFunc(options, (resp) => {
         resp.pause();
-        res.writeHead(200, { ...defaultHeaders, "Content-Type": "application/json" });
+        res.writeHead(200, { ...resp.headers, ...defaultHeaders, "Content-Type": "application/json" });
         resp.pipe(res);
         resp.resume();
       }),

@@ -2,7 +2,24 @@ import { css } from "@emotion/react";
 import React, { useState } from "react";
 import { inject, observer } from "mobx-react";
 import ApplianceStore from "../stores/appliance";
-import { Box, Button, Checkbox, FormControlLabel, Grid, Icon, Link, Paper, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Paper,
+  Card,
+  CardActionArea,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Icon,
+} from "@mui/material";
 
 interface IProps {
   ApplianceStore?: ApplianceStore;
@@ -33,27 +50,81 @@ const styles = {
   unit: css({
     marginLeft: "0.5em",
   }),
+  dialogTitle: css({
+    display: "flex",
+    justifyContent: "space-between",
+  }),
 };
 
 export const Appliance = inject("ApplianceStore")(
   observer((props: IProps) => {
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+    const [isOpenDialog, setIsOpenDialog] = useState(false);
+    const [applianceIndex, setApplianceIndex] = useState(-1);
+
+    const openDialog = (index: number) => {
+      setApplianceIndex(index);
+      setIsOpenDialog(true);
+    };
+    const closeDialog = () => {
+      setIsOpenDialog(false);
+      setApplianceIndex(-1);
+    };
+
     return (
-      <Grid container spacing={2} css={styles.root}>
-        {props.ApplianceStore!.appliances.length === 0 && (
-          <Grid item sm={4} md={3} lg={2} xl={1}>
-            <Paper className={"appliance"} css={styles.empty}>
-              <Typography color={"GrayText"}>アプライアンスがありません</Typography>
-            </Paper>
-          </Grid>
-        )}
-        {props.ApplianceStore!.appliances.map((appliance) => (
-          <Grid key={appliance.id} item sm={4} md={3} lg={2} xl={1}>
-            <Paper className={"appliance"} css={styles.paper}>
-              <Typography>{appliance.nickname}</Typography>
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
+      <>
+        <Grid container spacing={2} css={styles.root}>
+          {props.ApplianceStore!.appliances.length === 0 && (
+            <Grid item sm={4} md={3} lg={2} xl={1}>
+              <Paper className={"appliance"} css={styles.empty}>
+                <Typography color={"GrayText"}>アプライアンスがありません</Typography>
+              </Paper>
+            </Grid>
+          )}
+          {props.ApplianceStore!.appliances.map((appliance, index) => (
+            <Grid key={appliance.id} item sm={4} md={3} lg={2} xl={1}>
+              <Card className={"appliance"}>
+                <CardActionArea onClick={() => openDialog(index)}>
+                  <Box css={styles.paper}>
+                    <Typography>{appliance.nickname}</Typography>
+                  </Box>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+        <Dialog fullScreen={fullScreen} fullWidth open={isOpenDialog}>
+          <DialogTitle sx={{ m: 0, p: 2 }}>
+            <Box css={styles.dialogTitle}>
+              {props.ApplianceStore!.appliances[applianceIndex]?.nickname || "-"}
+              <IconButton
+                aria-label="close"
+                onClick={() => closeDialog()}
+                sx={{
+                  color: (theme) => theme.palette.grey[500],
+                }}
+              >
+                <Icon>close</Icon>
+              </IconButton>
+            </Box>
+          </DialogTitle>
+          <DialogContent>
+            {props.ApplianceStore!.appliances[applianceIndex]?.light &&
+              props.ApplianceStore!.appliances[applianceIndex]?.light.buttons.map((button) => (
+                <Button key={button.name} onClick={() => props.ApplianceStore!.sendLight(props.ApplianceStore!.appliances[applianceIndex]?.id, button.name)}>
+                  {button.label}
+                </Button>
+              ))}
+            {props.ApplianceStore!.appliances[applianceIndex]?.signals &&
+              props.ApplianceStore!.appliances[applianceIndex]?.signals.map((signal) => (
+                <Button key={signal.id} onClick={() => props.ApplianceStore!.sendSignal(signal.id)}>
+                  {signal.name}
+                </Button>
+              ))}
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }),
 );

@@ -32,3 +32,8 @@ body {
 .logo-type {
   font-family: "Rubik Dirt" !important;
 }
+
+.MuiDialog-root {
+  z-index: 900 !important;
+  backdrop-filter: blur(4px);
+}

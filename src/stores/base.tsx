@@ -46,7 +46,6 @@ export default class Base {
   protected generateFetchHeader(withAuth = true, override?: any) {
     const baseHeader = {
       Accept: "application/json",
-      "Content-Type": "application/json",
     };
     let result: any = { ...baseHeader };
     if (withAuth) {
