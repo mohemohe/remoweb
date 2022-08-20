@@ -74,9 +74,26 @@ export default class ApplianceStore extends Base {
 
     this.setState(State.RUNNING);
     try {
+      const body = new URLSearchParams();
+      if (option.button) {
+        body.append("button", option.button);
+      }
+      if (option.operation_mode) {
+        body.append("operation_mode", option.operation_mode);
+      }
+      if (option.temperature) {
+        body.append("temperature", option.temperature);
+      }
+      if (option.air_direction) {
+        body.append("air_direction", option.air_direction);
+      }
+      if (option.air_volume) {
+        body.append("air_volume", option.air_volume);
+      }
+
       const res = await ky.post(this.apiUrl("1/appliances", applianceId, "aircon_settings"), {
         headers: this.generateFetchHeader(),
-        body: new URLSearchParams(option as {}),
+        body,
       });
       if (!res.ok) {
         throw new Error();
