@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { inject, observer } from "mobx-react";
 import ApplianceStore from "../stores/appliance";
 import {
@@ -22,11 +22,25 @@ import {
   Divider,
   Tab,
   Tabs,
+  Slider,
 } from "@mui/material";
 
 interface IProps {
   ApplianceStore?: ApplianceStore;
 }
+
+const ja = {
+  auto: "自動",
+  swing: "スイング",
+  blow: "送風",
+  cool: "冷房",
+  dry: "ドライ",
+  warm: "暖房",
+};
+
+const t = (text: string) => {
+  return ja[text] || text;
+};
 
 const styles = {
   root: css({
@@ -56,6 +70,21 @@ const styles = {
   dialogTitle: css({
     display: "flex",
     justifyContent: "space-between",
+  }),
+  slider: css({
+    display: "flex",
+    alignItems: "center",
+
+    "& .label": {
+      display: "flex",
+      justifyContent: "flex-end",
+      paddingLeft: "1rem",
+      width: "8em",
+    },
+  }),
+  actionButton: css({
+    display: "flex",
+    justifyContent: "flex-end",
   }),
 };
 
@@ -139,11 +168,43 @@ export const Appliance = inject("ApplianceStore")(
   }),
 );
 
+const fallbackIndex = (arr: string[]) => {
+  const autoIndex = arr.findIndex((a) => a === "auto");
+  if (autoIndex !== -1) {
+    return autoIndex;
+  }
+  const swingIndex = arr.findIndex((a) => a === "swing");
+  if (swingIndex !== -1) {
+    return swingIndex;
+  }
+  return Math.floor((arr.length - 1) / 2);
+};
+
 const Aircon = inject("ApplianceStore")(
   observer((props: IProps & { applianceIndex: number }) => {
     const { id, aircon, settings } = props.ApplianceStore!.appliances[props.applianceIndex];
 
-    const [mode, setMode] = useState(settings.mode);
+    const [operation_mode, setOperationMode] = useState(settings.mode);
+    const [temperature, setTemperature] = useState(settings.temp);
+    const [air_direction, setAirDirection] = useState(settings.dir);
+    const [air_volume, setAirVolume] = useState(settings.vol);
+
+    const { temp: rawTemp, dir: rawDir, vol: rawVol } = aircon?.range.modes[operation_mode as "auto"];
+    const temp = rawTemp.filter((t) => t !== "");
+    const dir = rawDir.filter((d) => d !== "");
+    const vol = rawVol.filter((v) => v !== "");
+
+    useEffect(() => {
+      if (operation_mode === settings.mode) {
+        setTemperature(settings.temp);
+        setAirDirection(settings.dir);
+        setAirVolume(settings.vol);
+      } else {
+        setTemperature(temp[fallbackIndex(temp)]);
+        setAirDirection(dir[fallbackIndex(dir)]);
+        setAirVolume(vol[fallbackIndex(vol)]);
+      }
+    }, [operation_mode]);
 
     return (
       <>
@@ -154,27 +215,84 @@ const Aircon = inject("ApplianceStore")(
                 {button}
               </Button>
             ))}
-            <Divider sx={{ my: 2 }} />
+            <Divider sx={{ mt: 2 }} />
           </>
         )}
         {aircon?.range.modes && (
           <>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs value={mode} onChange={(e, value) => setMode(value)}>
+              <Tabs value={operation_mode} onChange={(e, value) => setOperationMode(value)}>
                 {Object.keys(aircon?.range.modes).map((modeKey) => (
-                  <Tab label={modeKey} value={modeKey} />
+                  <Tab label={t(modeKey)} value={modeKey} />
                 ))}
               </Tabs>
             </Box>
             {
               <>
-                {(aircon?.range.modes as any)[mode].temp.map((temp: any) => (
-                  <Button key={temp} onClick={() => "TODO"}>
-                    {temp}
-                  </Button>
-                ))}
+                <Box my={2}>
+                  <Typography>{"温度"}</Typography>
+                  <Box css={styles.slider} mb={2}>
+                    <Slider
+                      className={"slider"}
+                      disabled={temp.length === 0}
+                      value={temp.findIndex((t) => t === temperature)}
+                      min={0}
+                      max={temp.length - 1}
+                      marks={true}
+                      valueLabelFormat={(value) => temp[value as number] + " ℃"}
+                      valueLabelDisplay={"auto"}
+                      onChange={(e, value) => setTemperature(temp[value as number])}
+                    />
+                    <Box className={"label"}>
+                      <Typography>{(temperature || "-") + " ℃"}</Typography>
+                    </Box>
+                  </Box>
+                </Box>
+
+                <Box my={2}>
+                  <Typography>{"風向"}</Typography>
+                  <Box css={styles.slider} mb={2}>
+                    <Slider
+                      className={"slider"}
+                      disabled={dir.length === 0}
+                      value={dir.findIndex((t) => t === air_direction)}
+                      min={0}
+                      max={dir.length - 1}
+                      marks={true}
+                      valueLabelFormat={(value) => t(dir[value as number])}
+                      valueLabelDisplay={"auto"}
+                      onChange={(e, value) => setAirDirection(dir[value as number])}
+                    />
+                    <Box className={"label"}>
+                      <Typography>{t(air_direction)}</Typography>
+                    </Box>
+                  </Box>
+                </Box>
+
+                <Box my={2}>
+                  <Typography>{"風量"}</Typography>
+                  <Box css={styles.slider} mb={2}>
+                    <Slider
+                      className={"slider"}
+                      disabled={vol.length === 0}
+                      value={vol.findIndex((t) => t === air_volume)}
+                      min={0}
+                      max={vol.length - 1}
+                      marks={true}
+                      valueLabelFormat={(value) => t(vol[value as number])}
+                      valueLabelDisplay={"auto"}
+                      onChange={(e, value) => setAirVolume(vol[value as number])}
+                    />
+                    <Box className={"label"}>
+                      <Typography>{t(air_volume)}</Typography>
+                    </Box>
+                  </Box>
+                </Box>
               </>
             }
+            <Box css={styles.actionButton} pt={1}>
+              <Button onClick={() => props.ApplianceStore!.sendAircon(id, { operation_mode, temperature, air_direction, air_volume })}>適用</Button>
+            </Box>
           </>
         )}
       </>
