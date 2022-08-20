@@ -24,23 +24,12 @@ import {
   Tabs,
   Slider,
 } from "@mui/material";
+import { t } from "@/ja";
+import { useWillUnmount } from "@/utils/effects";
 
 interface IProps {
   ApplianceStore?: ApplianceStore;
 }
-
-const ja = {
-  auto: "自動",
-  swing: "スイング",
-  blow: "送風",
-  cool: "冷房",
-  dry: "ドライ",
-  warm: "暖房",
-};
-
-const t = (text: string) => {
-  return ja[text] || text;
-};
 
 const styles = {
   root: css({
