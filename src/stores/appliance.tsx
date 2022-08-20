@@ -59,6 +59,32 @@ export default class ApplianceStore extends Base {
   }
 
   @action
+  public async sendTv(applianceId: string, buttonName: string) {
+    if (!this.fetchable) {
+      return;
+    }
+
+    this.setState(State.RUNNING);
+    try {
+      const res = await ky.post(this.apiUrl("1/appliances", applianceId, "tv"), {
+        headers: this.generateFetchHeader(),
+        body: new URLSearchParams({
+          button: buttonName,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error();
+      }
+      // this.appliances = await res.json<Appliance[]>();
+      return this.setState(State.DONE);
+    } catch (e) {
+      this.tryEnqueueSnackbar("アプライアンスの操作に失敗しました");
+
+      return this.setState(State.ERROR);
+    }
+  }
+
+  @action
   public async sendLight(applianceId: string, buttonName: string) {
     if (!this.fetchable) {
       return;

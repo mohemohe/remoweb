@@ -116,6 +116,12 @@ export const Appliance = inject("ApplianceStore")(
                   {button.label}
                 </Button>
               ))}
+            {props.ApplianceStore!.appliances[applianceIndex]?.tv &&
+              props.ApplianceStore!.appliances[applianceIndex]?.tv.buttons.map((button) => (
+                <Button key={button.name} onClick={() => props.ApplianceStore!.sendTv(props.ApplianceStore!.appliances[applianceIndex]?.id, button.name)}>
+                  {button.label}
+                </Button>
+              ))}
             {props.ApplianceStore!.appliances[applianceIndex]?.signals &&
               props.ApplianceStore!.appliances[applianceIndex]?.signals.map((signal) => (
                 <Button key={signal.id} onClick={() => props.ApplianceStore!.sendSignal(signal.id)}>
