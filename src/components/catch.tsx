@@ -6,6 +6,7 @@ export const Catch: React.FC<FallbackProps> = ({ error, resetErrorBoundary }) =>
     <div style={{ color: "#fff" }}>
       <h1>Error!</h1>
       <pre>{error!.message}</pre>
+      <button onClick={() => resetErrorBoundary()}>Continue</button>
       <button onClick={() => location.reload()}>Reload</button>
     </div>
   );
