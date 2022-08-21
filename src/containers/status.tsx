@@ -57,13 +57,13 @@ export const Status = inject("DeviceStore")(
                 </Typography>
               </Box>
               <Grid container spacing={2} mt={0}>
-                <Grid key={device.id} item sm={6}>
+                <Grid item sm={6}>
                   <Box css={styles.hol}>
                     <Typography variant={"h5"}>{device.newest_events.hu?.val || "-"}</Typography>
                     <Typography css={styles.unit}>%</Typography>
                   </Box>
                 </Grid>
-                <Grid key={device.id} item sm={6}>
+                <Grid item sm={6}>
                   <Box css={styles.hol}>
                     <Typography variant={"h5"}>{device.newest_events.il?.val || "-"}</Typography>
                     <Typography css={styles.unit}>lx</Typography>

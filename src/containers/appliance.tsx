@@ -222,7 +222,7 @@ const Aircon = inject("ApplianceStore")(
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
               <Tabs value={operation_mode} onChange={(e, value) => setOperationMode(value)}>
                 {Object.keys(aircon?.range.modes).map((modeKey) => (
-                  <Tab label={t(modeKey)} value={modeKey} />
+                  <Tab key={modeKey} label={t(modeKey)} value={modeKey} />
                 ))}
               </Tabs>
             </Box>
