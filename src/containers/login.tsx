@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { inject, observer } from "mobx-react";
 import AuthStore from "../stores/auth";
 import { Box, Button, Checkbox, FormControlLabel, Icon, Link, Paper, TextField, Typography } from "@mui/material";
+import { PasswordInput } from "@/components/passwordInput";
 
 interface IProps {
   AuthStore?: AuthStore;
@@ -53,7 +54,14 @@ export const Login = inject("AuthStore")(
             }}
           >
             <Box mb={1}>
-              <TextField name={"id"} label={"Access Token"} fullWidth value={accessToken} onChange={(e) => setAcessToken(e.target.value)} />
+              <PasswordInput
+                name={"password"}
+                type={"password"}
+                label={"Access Token"}
+                fullWidth
+                value={accessToken}
+                onChange={(e) => setAcessToken(e.target.value)}
+              />
             </Box>
             <Box mb={1}>
               <FormControlLabel
