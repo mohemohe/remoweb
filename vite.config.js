@@ -20,8 +20,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      sourcemap: process.env.AWS_CDK !== "1",
-      outDir: process.env.AWS_CDK === "1" ? "/asset-output/" : "./dist/",
+      sourcemap: true,
+      outDir: path.resolve(__dirname, "dist"),
     },
     plugins: [
       tsconfigPaths({
