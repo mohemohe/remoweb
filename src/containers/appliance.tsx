@@ -120,13 +120,13 @@ export const Appliance = inject("ApplianceStore")(
                           {t(appliance.settings.mode)}
                         </Typography>
                         <Typography variant={"body2"} color={"textSecondary"}>
-                          温度: {t(appliance.settings.temp)} {appliance.aircon.tempUnit === "c" ? "℃" : "℉"}
+                          温度: {t(appliance.settings.temp) || "-"} {appliance.settings.temp && appliance.aircon.tempUnit === "c" ? "℃" : "℉"}
                         </Typography>
                         <Typography variant={"body2"} color={"textSecondary"}>
-                          風向: {t(appliance.settings.dir)}
+                          風向: {t(appliance.settings.dir) || "-"}
                         </Typography>
                         <Typography variant={"body2"} color={"textSecondary"}>
-                          風量: {t(appliance.settings.vol)}
+                          風量: {t(appliance.settings.vol) || "-"}
                         </Typography>
                       </Box>
                     )}
