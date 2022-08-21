@@ -16,6 +16,8 @@
     "sass": "^1.54.4",
     "typescript": "^4.7.4",
     "vite": "^3.0.8",
+    "vite-plugin-pwa": "^0.12.3",
+    "vite-plugin-static-copy": "^0.7.0",
     "vite-tsconfig-paths": "^3.5.0"
   },
   "dependencies": {
@@ -33,6 +35,7 @@
     "sanitize.css": "^13.0.0"
   },
   "scripts": {
+    "build": "vite build",
     "watch": "yarn watch:mockproxy",
     "watch:mockproxy": "VITE_API_BASE_URL=http://localhost:1234 vite",
     "watch:nature": "vite",
