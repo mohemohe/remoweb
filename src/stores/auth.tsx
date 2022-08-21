@@ -55,21 +55,17 @@ export default class AuthStore extends Base {
     await this.checkAuth();
     if (this.authStatus !== AuthStatus.Authorized) {
       this.tryEnqueueSnackbar("認証エラー");
-      return this.logout(false);
+      return this.logout();
     }
     if (useLocalStorage) {
       localStorage.accessToken = accessToken;
     }
-    this.tryEnqueueSnackbar("認証成功");
   }
 
   @action
-  public async logout(showToast = true) {
+  public async logout() {
     delete sessionStorage.accessToken;
     delete localStorage.accessToken;
     this.setAuthStatus(AuthStatus.Unauthorized);
-    if (showToast) {
-      this.tryEnqueueSnackbar("アクセストークンを削除しました");
-    }
   }
 }
