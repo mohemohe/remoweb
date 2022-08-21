@@ -23,7 +23,6 @@ import {
   Slider,
 } from "@mui/material";
 import { t } from "@/ja";
-import { useWillUnmount } from "@/utils/effects";
 
 interface IProps {
   ApplianceStore?: ApplianceStore;
@@ -112,8 +111,33 @@ export const Appliance = inject("ApplianceStore")(
               <Card className={"appliance"}>
                 <CardActionArea onClick={() => openDialog(index)}>
                   <Box css={styles.paper}>
+                    <Box>
                       <Typography>{appliance.nickname}</Typography>
                     </Box>
+                    {appliance.settings && (
+                      <Box mt={2}>
+                        <Typography variant={"body2"} color={"textSecondary"}>
+                          {t(appliance.settings.mode)}
+                        </Typography>
+                        <Typography variant={"body2"} color={"textSecondary"}>
+                          温度: {t(appliance.settings.temp)} {appliance.aircon.tempUnit === "c" ? "℃" : "℉"}
+                        </Typography>
+                        <Typography variant={"body2"} color={"textSecondary"}>
+                          風向: {t(appliance.settings.dir)}
+                        </Typography>
+                        <Typography variant={"body2"} color={"textSecondary"}>
+                          風量: {t(appliance.settings.vol)}
+                        </Typography>
+                      </Box>
+                    )}
+                    {appliance.light?.state && (
+                      <Box mt={2}>
+                        <Typography variant={"body2"} color={"textSecondary"}>
+                          {appliance.light.state.power?.toUpperCase()}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
                 </CardActionArea>
               </Card>
             </Grid>
