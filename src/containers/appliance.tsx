@@ -289,7 +289,7 @@ const Aircon = inject("ApplianceStore")(
                       onChange={(e, value) => setAirDirection(dir[value as number])}
                     />
                     <Box className={"label"}>
-                      <Typography>{t(air_direction)}</Typography>
+                      <Typography>{t(air_direction) || "-"}</Typography>
                     </Box>
                   </Box>
                 </Box>
@@ -309,7 +309,7 @@ const Aircon = inject("ApplianceStore")(
                       onChange={(e, value) => setAirVolume(vol[value as number])}
                     />
                     <Box className={"label"}>
-                      <Typography>{t(air_volume)}</Typography>
+                      <Typography>{t(air_volume) || "-"}</Typography>
                     </Box>
                   </Box>
                 </Box>
