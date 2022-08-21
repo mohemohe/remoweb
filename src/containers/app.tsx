@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { inject, observer } from "mobx-react";
 import { useSnackbar } from "notistack";
-import { Box, css, Typography } from "@mui/material";
+import { BottomNavigation, BottomNavigationAction, Box, css, Icon } from "@mui/material";
 import { useDidMount } from "@/utils/effects";
 import AuthStore, { AuthStatus } from "../stores/auth";
 import LoadingStore from "../stores/loading";
 import DeviceStore from "../stores/device";
 import ApplianceStore from "../stores/appliance";
 import { Login } from "./login";
-import { Status } from "./status";
-import { Appliance } from "./appliance";
+import { Control } from "./control";
+import { Setting } from "./setting";
 
 interface IProps {
   AuthStore?: AuthStore;
@@ -19,8 +19,14 @@ interface IProps {
 }
 
 const styles = {
-  sectionText: css({
-    margin: "2rem",
+  root: css({
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+  }),
+  main: css({
+    flex: 1,
+    overflow: "auto",
   }),
 };
 
@@ -32,6 +38,7 @@ export const App = inject(
 )(
   observer((props: IProps) => {
     const { enqueueSnackbar } = useSnackbar();
+    const [bottomTabIndex, setBottomTabIndex] = useState(0);
 
     const reloadAll = async () => {
       props.LoadingStore!.lockLoading();
@@ -55,17 +62,21 @@ export const App = inject(
 
     return (
       <>
-        <Box>
-          <Box css={styles.sectionText}>
-            <Typography variant={"h4"}>ステータス</Typography>
+        <Box css={styles.root}>
+          <Box css={styles.main}>
+            {bottomTabIndex === 0 && <Control />}
+            {bottomTabIndex === 1 && <Setting />}
           </Box>
-          <Status />
-        </Box>
-        <Box>
-          <Box css={styles.sectionText}>
-            <Typography variant={"h4"}>コントロール</Typography>
-          </Box>
-          <Appliance />
+          <BottomNavigation
+            showLabels
+            value={bottomTabIndex}
+            onChange={(event, newValue) => {
+              setBottomTabIndex(newValue);
+            }}
+          >
+            <BottomNavigationAction label="コントロール" icon={<Icon>wifi</Icon>} />
+            <BottomNavigationAction label="設定" icon={<Icon>settings</Icon>} />
+          </BottomNavigation>
         </Box>
         {props.AuthStore!.authStatus === AuthStatus.Unauthorized && <Login />}
       </>
