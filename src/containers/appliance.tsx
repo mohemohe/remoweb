@@ -262,12 +262,14 @@ const Aircon = inject("ApplianceStore")(
                       min={0}
                       max={temp.length - 1}
                       marks={true}
-                      valueLabelFormat={(value) => temp[value as number] + " ℃"}
+                      valueLabelFormat={(value) => (temp[value as number] + aircon.tempUnit === "c" ? "℃" : "℉")}
                       valueLabelDisplay={"auto"}
                       onChange={(e, value) => setTemperature(temp[value as number])}
                     />
                     <Box className={"label"}>
-                      <Typography>{(temperature || "-") + " ℃"}</Typography>
+                      <Typography>
+                        {temperature || "-"} {aircon.tempUnit === "c" ? "℃" : "℉"}
+                      </Typography>
                     </Box>
                   </Box>
                 </Box>
