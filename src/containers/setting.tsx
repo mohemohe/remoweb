@@ -5,9 +5,6 @@ import AuthStore, { AuthStatus } from "../stores/auth";
 import LoadingStore from "../stores/loading";
 import DeviceStore from "../stores/device";
 import ApplianceStore from "../stores/appliance";
-import { Login } from "./login";
-import { Status } from "./status";
-import { Appliance } from "./appliance";
 
 interface IProps {
   AuthStore?: AuthStore;

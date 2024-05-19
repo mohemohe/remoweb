@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { inject, observer } from "mobx-react";
 import { useSnackbar } from "notistack";
-import { BottomNavigation, BottomNavigationAction, Box, css, Icon } from "@mui/material";
+import { BottomNavigation, BottomNavigationAction, Box, CircularProgress, css, Fab, Icon } from "@mui/material";
 import { useDidMount } from "@/utils/effects";
 import AuthStore, { AuthStatus } from "../stores/auth";
 import LoadingStore from "../stores/loading";
@@ -10,12 +10,14 @@ import ApplianceStore from "../stores/appliance";
 import { Login } from "./login";
 import { Control } from "./control";
 import { Setting } from "./setting";
+import TimerStore from "@/stores/timer";
 
 interface IProps {
   AuthStore?: AuthStore;
   DeviceStore?: DeviceStore;
   ApplianceStore?: ApplianceStore;
   LoadingStore?: typeof LoadingStore;
+  TimerStore?: TimerStore;
 }
 
 const styles = {
@@ -35,19 +37,11 @@ export const App = inject(
   "DeviceStore",
   "ApplianceStore",
   "LoadingStore",
+  "TimerStore",
 )(
   observer((props: IProps) => {
     const { enqueueSnackbar } = useSnackbar();
     const [bottomTabIndex, setBottomTabIndex] = useState(0);
-
-    const reloadAll = async () => {
-      props.LoadingStore!.lockLoading();
-      try {
-        await Promise.all([props.DeviceStore!.fetchDevices(), props.ApplianceStore!.fetchAppliances()]);
-      } finally {
-        props.LoadingStore!.unlockLoading();
-      }
-    };
 
     useDidMount(async () => {
       (window as any).enqueueSnackbar = enqueueSnackbar;
@@ -56,7 +50,7 @@ export const App = inject(
 
     useEffect(() => {
       if (props.AuthStore!.authStatus === AuthStatus.Authorized) {
-        reloadAll();
+        props.TimerStore!.reload();
       }
     }, [props.AuthStore!.authStatus]);
 
@@ -77,6 +71,15 @@ export const App = inject(
             <BottomNavigationAction label="コントロール" icon={<Icon>wifi</Icon>} />
             <BottomNavigationAction label="設定" icon={<Icon>settings</Icon>} />
           </BottomNavigation>
+        </Box>
+        <Box position={"fixed"} bottom={16} right={16}>
+          <Fab
+            aria-label="save"
+            onClick={async () => await props.TimerStore!.reload()}
+          >
+            <Icon>refresh</Icon>
+          </Fab>
+          <CircularProgress size={68} color="primary" variant="determinate" value={props.TimerStore!.value} sx={{ position: "absolute", top: -6, left: -6 }} />
         </Box>
         {props.AuthStore!.authStatus === AuthStatus.Unauthorized && <Login />}
       </>
