@@ -42,9 +42,14 @@ export const Login = inject("AuthStore")(
     return (
       <div css={styles.root}>
         <Paper css={styles.paper}>
-          <Box css={styles.logoTypeWrapper} mb={4}>
+          <Box css={styles.logoTypeWrapper}>
             <Typography className="logo-type" variant={"h3"}>
               RemoWeb
+            </Typography>
+          </Box>
+          <Box mb={4} display={"flex"} justifyContent={"center"}>
+            <Typography variant={"subtitle1"}>
+              Web client for Nature Remo
             </Typography>
           </Box>
           <form
