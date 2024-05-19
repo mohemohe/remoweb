@@ -107,7 +107,7 @@ export const Appliance = inject("ApplianceStore")(
             </Grid>
           )}
           {props.ApplianceStore!.appliances.map((appliance, index) => (
-            <Grid key={appliance.id} item sm={4} md={3} lg={2} xl={1}>
+            <Grid key={appliance.id} item xs={6} sm={4} md={4} lg={3} xl={2}>
               <Card className={"appliance"}>
                 <CardActionArea onClick={() => openDialog(index)}>
                   <Box css={styles.paper}>
